@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏡KOSAN: Cari Kos, Kontrakan, Penginapan</title>
+    <style>
+        /* CSS Dasar */
+        body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f4f9; display: flex; flex-direction: column; min-height: 100vh; }
+        .container { padding: 20px; flex: 1; max-width: 1200px; margin: 0 auto; width: 100%; }
+        
+        /* HEADER dan LOGO */
+        header { 
+            background-color: #3f51b5; 
+            color: white; 
+            padding: 30px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            width: 430px;
+        }
+        header h1 { margin: 0; font-size: 1.8em; }
+
+        /* --- STYLING MENU HAMBURGER BARU (JS-controlled) --- */
+        .hamburger {
+            cursor: pointer;
+            width: 30px;
+            height: 24px;
+            position: relative;
+            z-index: 20; 
+            /* Tambahkan animasi untuk ikon (optional) */
+            transition: all 0.3s ease;
+        }
+        .hamburger span {
+            display: block;
+            width: 100%;
+            height: 3px;
+            background-color: white;
+            border-radius: 3px;
+            margin: 5px 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-menu {
+            list-style: none;
+            position: fixed; /* Gunakan fixed agar menu tetap saat di-scroll */
+            top: 0;
+            right: 0;
+            background-color: #3f51b5;
+            width: 250px;
+            height: 100vh;
+            padding: 70px 20px 20px 20px;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.5);
+            transform: translateX(100%); /* Default: Sembunyikan menu ke kanan */
+            transition: transform 0.3s ease-in-out; /* Transisi dikontrol JS */
+            z-index: 10;
+        }
+
+        /* Kelas yang ditambahkan oleh JavaScript */
+        .nav-menu.active {
+            transform: translateX(0); /* Tampilkan menu */
+        }
+        
+        .nav-menu li { margin-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
+        .nav-menu a { color: white; text-decoration: none; font-size: 1.1em; padding: 10px 0; display: block; }
+        .nav-menu a:hover { color: #ffe082; }
+
+        /* Opsional: Animasi Ikon X saat terbuka */
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+        .hamburger.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+
+        /* CSS Lainnya (Sama seperti sebelumnya) */
+        .search-bar { background-color: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 30px; display: flex; align-items: center; }
+        .search-bar input[type="text"] { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-right: 10px; }
+        .search-bar button { padding: 12px 20px; border: none; border-radius: 4px; background-color: #4CAF50; color: white; cursor: pointer; font-weight: bold; }
+        
+        .type-selector-container { max-width: 500px; margin: 0 auto 30px auto; padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; }
+        .type-selector-container h2 { color: #3f51b5; margin-top: 0; }
+        .type-buttons-vertical { display: flex; flex-direction: column; gap: 10px; }
+        .type-button { border: 1px solid #3f51b5; color: #3f51b5; padding: 20px 5px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1.0em; background-color: #e3f2fd; transition: background-color 0.3s; }
+        .type-button:hover { background-color: #3f51b5; color: white; }
+
+        .property-list-title { margin-top: 40px; }
+        .property-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .card { background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden; transition: transform 0.2s; }
+        .card img { width: 100%; height: 160px; object-fit: cover; }
+        .card-body { padding: 12px; }
+        .card-title { font-size: 1.1em; margin-top: 0; }
+        .price { color: #f44336; font-weight: bold; margin-bottom: 8px; font-size: 1em;}
+        
+        footer { background-color: cornsilk; color: cornsilk; padding: 40px 30px; text-align: center; margin-left: 40px; border-radius: 5px;}
+        .footer-content { max-width: 900px; margin: 10px; display: flex; justify-content: space-around; flex-wrap: wrap; text-align: left; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1> 🏘️ KOSAN</h1>
+        
+        <div class="hamburger" id="hamburger-icon">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <ul class="nav-menu" id="nav-menu">
+            <li><a href="login.html">👤 Login / Register</a></li>
+            <li><a href="#">⭐ Pesanan / Booking</a></li>
+            <li><a href="#">💬 Layanan Pengguna</a></li>
+            <li><a href="#">ℹ️ Tentang Kami</a></li>
+        
+        </ul>
+    </header>
+
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" placeholder="Cari lokasi, kota, kampus, atau alamat...">
+            <button>Cari</button>
+        </div>
+
+        <div class="type-selector-container">
+            <h2>Pilih Jenis Akomodasi</h2>
+            <div class="type-buttons-vertical">
+                <a href="#" class="type-button">
+                    🛌 Kos (Bulanan & Tahunan)
+                </a>
+                <a href="#" class="type-button">
+                    🏠 Kontrakan (Rumah Keluarga)
+                </a>
+                <a href="#" class="type-button">
+                    🏨 Penginapan (Harian & Mingguan)
+                </a>
+            </div>
+        </div>
+        
+        <hr>
+
+        <h2 class="property-list-title">✨ Pilihan Unggulan di Dekat Anda</h2>
+
+        <div class="property-list">
+            <div class="card">
+                <img src="https://via.placeholder.com/300x160?text=Kamar+Kos+Nyaman" alt="Kamar Kos">
+                <div class="card-body">
+                    <h3 class="card-title">Kos Putri "Anggrek" dekat UGM</h3>
+                    <p class="price">Rp 800.000 / Bulan</p>
+                    <p style="font-size: 0.9em;">📍 Sleman | Fasilitas: AC, KM Dalam</p>
+                    <a href="detail_properti.html" style="color: #3f51b5; text-decoration: none; font-size: 0.9em;">Lihat Detail →</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <img src="https://via.placeholder.com/300x160?text=Kontrakan+2+Kamar" alt="Kontrakan">
+                <div class="card-body">
+                    <h3 class="card-title">Kontrakan 2 Kamar Minimalis</h3>
+                    <p class="price">Rp 18.000.000 / Tahun</p>
+                    <p style="font-size: 0.9em;">📍 Jakarta Selatan | Fasilitas: Dapur, Parkir Mobil</p>
+                    <a href="detail_properti.html" style="color: #3f51b5; text-decoration: none; font-size: 0.9em;">Lihat Detail →</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <img src="https://via.placeholder.com/300x160?text=Penginapan+Harian+Murah" alt="Penginapan">
+                <div class="card-body">
+                    <h3 class="card-title">Penginapan Transit Kota Bandung</h3>
+                    <p class="price">Rp 150.000 / Hari</p>
+                    <p style="font-size: 0.9em;">📍 Bandung Pusat | Fasilitas: Wi-Fi, Air Panas</p>
+                    <a href="detail_properti.html" style="color: #3f51b5; text-decoration: none; font-size: 0.9em;">Lihat Detail →</a>
+                </div>
+            </div>
+            
+             <div class="card">
+                <img src="https://via.placeholder.com/300x160?text=Kos+Campur+Murah" alt="Kos Campur">
+                <div class="card-body">
+                    <h3 class="card-title">Kos Campur Jakbar Cepat</h3>
+                    <p class="price">Rp 650.000 / Bulan</p>
+                    <p style="font-size: 0.9em;">📍 Jakarta Barat | Fasilitas: Jemuran, Kipas Angin</p>
+                    <a href="detail_properti.html" style="color: #3f51b5; text-decoration: none; font-size: 0.9em;">Lihat Detail →</a>
+                </div>
+            </div>
+        </div>
+        
+        <hr>
+
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Tentang INDO-KOST</h4>
+                <p style="font-size: 0.9em; color: #ccc;">Platform terpercaya untuk mencari dan menyewa kos, kontrakan, dan penginapan di seluruh Indonesia.</p>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Navigasi</h4>
+                <a href="#">Beranda</a>
+                <a href="#">Cara Kerja</a>
+                <a href="#">Pusat Bantuan</a>
+                <a href="#">Login Pemilik</a>
+            </div>
+
+            <div class="footer-section">
+                <h4>Kontak Kami</h4>
+                <p>📞 **Telepon:** 0812-3456-7890</p>
+                <p>📧 **Email:** support@indokost.co.id</p>
+                <p>🏢 **Alamat:** Jln. Digital No. 10, Jakarta</p>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 INDO-KOST. Hak Cipta Dilindungi.
+        </div>
+    </footer>
+
+    <script>
+        // --- KODE JAVASCRIPT UNTUK MENU HAMBURGER ---
+        
+        // 1. Ambil elemen-elemen dari DOM
+        const hamburgerIcon = document.getElementById('hamburger-icon');
+        const navMenu = document.getElementById('nav-menu');
+
+        // 2. Tambahkan event listener untuk merespons klik
+        hamburgerIcon.addEventListener('click', function() {
+            // 3. Toggle class 'active' pada menu
+            navMenu.classList.toggle('active');
+            
+            // 4. Toggle class 'active' pada ikon hamburger (untuk animasi X)
+            hamburgerIcon.classList.toggle('active');
+        });
+
+        // Opsional: Tutup menu saat salah satu link diklik
+        const navLinks = document.querySelectorAll('.nav-menu a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                hamburgerIcon.classList.remove('active');
+            });
+        });
+        
+    </script>
+</body>
+</html>
